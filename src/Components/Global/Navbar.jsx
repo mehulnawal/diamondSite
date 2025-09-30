@@ -1,87 +1,140 @@
-import { User, LogIn, LogOut } from "lucide-react";
+import React, { useState, useRef, useEffect } from 'react';
 import { Outlet } from "react-router";
+import { User, ShoppingCart, Search, X, Menu } from "lucide-react"; 
 
 export default function Navbar() {
+    // State to manage the visibility of the search overlay
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    
+    // Ref to hold a reference to the search input element
+    const searchInputRef = useRef(null);
+
+    const toggleSearch = () => {
+        setIsSearchOpen(!isSearchOpen);
+    };
+
+    // useEffect hook to handle focus when the search bar state changes
+    useEffect(() => {
+        if (isSearchOpen) {
+            // Wait for the component to render and the bar to become visible, 
+            // then focus the input field using the ref
+            searchInputRef.current?.focus();
+        }
+    }, [isSearchOpen]); // Dependency array: runs whenever isSearchOpen changes
+
     return (
         <>
-            <nav className="sticky top-0 h-20 w-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.1)] flex items-center justify-between px-8 z-50">
-                {/* Logo */}
-                <div className="flex items-center">
-                    <img
-                        src="/logo-diamond.png"
-                        alt="Diamond Business Logo"
-                        className="h-[50px] mr-4"
-                        style={{ filter: "drop-shadow(0 2px 6px #D4AF37)" }}
-                    />
-                    <span className="font-playfair text-2xl font-bold text-[#1E40AF] tracking-wide">
-                        Diamond Business
+            {/* Search Overlay Component: Slides down from the top */}
+            <div
+                className={`fixed top-0 left-0 w-full bg-white transition-all duration-300 ease-in-out z-[60] 
+                ${isSearchOpen ? 'h-32 opacity-100 shadow-xl' : 'h-0 opacity-0 overflow-hidden'}`}
+            >
+                <div className="max-w-4xl mx-auto h-full flex items-center justify-center px-6">
+                    <form className="w-full flex">
+                        <input
+                            type="text"
+                            // 1. Attach the ref to the input field
+                            ref={searchInputRef}
+                            // Search bar placeholder
+                            placeholder="Search Adena for jewelry, collections, and more..." 
+                            // Styling
+                            className="flex-grow p-3 text-xl text-black border-b-2 border-gray-400 placeholder-gray-500 focus:outline-none focus:border-black"
+                        />
+                        <button 
+                            type="submit" 
+                            aria-label="Submit Search"
+                            className="p-3 text-gray-500 hover:text-black transition-colors"
+                        >
+                            <Search className="w-6 h-6" />
+                        </button>
+                    </form>
+                    
+                    {/* Close Button for Search Bar */}
+                    <button 
+                        onClick={toggleSearch} 
+                        aria-label="Close Search"
+                        className="ml-6 p-2 text-gray-500 hover:text-red-600 transition-colors"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Main Navbar: Logo (Left), Links (Center), Icons (Right) */}
+            <nav className="sticky top-0 h-20 w-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.1)] flex items-center justify-between px-6 md:px-12 z-50">
+
+                {/* LEFT: Logo/Brand Name */}
+                <div className="flex-shrink-0">
+                    <span className="font-serif text-3xl font-normal text-black tracking-widest uppercase">
+                        ADENA
                     </span>
                 </div>
-                {/* Navigation Links */}
-                <div className="hidden md:flex gap-8 items-center text-[#0F172A] font-semibold text-lg">
+
+                {/* CENTER: Navigation Links (Absolute positioning to center them) */}
+                <div className="hidden lg:flex gap-8 items-center text-gray-700 font-medium text-base absolute left-1/2 transform -translate-x-1/2">
                     <a
                         href="/"
-                        className="hover:underline decoration-[#D4AF37] underline-offset-8 transition-all duration-300"
+                        className="hover:text-black transition-colors duration-200"
                     >
                         Home
                     </a>
                     <a
-                        href="/about"
-                        className="hover:underline decoration-[#D4AF37] underline-offset-8 transition-all duration-300"
+                        href="/shop"
+                        className="hover:text-black transition-colors duration-200"
                     >
-                        About
+                        Shop
                     </a>
                     <a
-                        href="/features"
-                        className="hover:underline decoration-[#D4AF37] underline-offset-8 transition-all duration-300"
+                        href="/product"
+                        className="hover:text-black transition-colors duration-200"
                     >
-                        Features
+                        Product
                     </a>
                     <a
-                        href="/contact"
-                        className="hover:underline decoration-[#D4AF37] underline-offset-8 transition-all duration-300"
+                        href="/blog"
+                        className="hover:text-black transition-colors duration-200"
                     >
-                        Contact
+                        Blog
                     </a>
                     <a
-                        href="/products"
-                        className="hover:underline decoration-[#D4AF37] underline-offset-8 transition-all duration-300"
+                        href="/featured"
+                        className="hover:text-black transition-colors duration-200"
                     >
-                        Products
+                        Featured
                     </a>
                 </div>
-                {/* Auth Buttons */}
-                <div className="flex gap-4 items-center">
-                    <a
-                        href="/login"
-                        className="border-2 border-[#D4AF37] text-[#D4AF37] rounded-md px-6 py-2 font-montserrat font-semibold transition-all duration-300 hover:bg-[#D4AF37] hover:text-white hover:scale-105 hover:shadow-lg"
-                    >
-                        <LogIn className="inline-block w-5 h-5 mr-2" />
-                        Login
-                    </a>
-                    <a
-                        href="/register"
-                        className="border-2 border-[#D4AF37] text-[#D4AF37] rounded-md px-6 py-2 font-montserrat font-semibold transition-all duration-300 hover:bg-[#D4AF37] hover:text-white hover:scale-105 hover:shadow-lg"
-                    >
-                        <User className="inline-block w-5 h-5 mr-2" />
-                        Register
-                    </a>
+
+                {/* RIGHT: Icon Buttons and Mobile Menu Toggle */}
+                <div className="flex-shrink-0 flex gap-4 items-center">
+                    
+                    {/* Icons */}
+                    <div className="flex gap-4 items-center text-gray-700">
+                        {/* Search Icon (Opens the overlay) */}
+                        <button aria-label="Search" onClick={toggleSearch}>
+                            <Search className="w-5 h-5 hover:text-black transition-colors" />
+                        </button>
+                        <a href="/account" aria-label="User Account">
+                            <User className="w-5 h-5 hover:text-black transition-colors" />
+                        </a>
+                        <a href="/cart" aria-label="Shopping Cart" className="relative">
+                            <ShoppingCart className="w-5 h-5 hover:text-black transition-colors" />
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                                1
+                            </span>
+                        </a>
+                    </div>
+                    
+                    {/* 'Verify it's you' element */}
+                    <div className="hidden lg:flex items-center text-sm text-gray-500 border-l pl-4 ml-2">
+                        <span>Verify it's you</span>
+                        <span className="ml-1 text-red-500 text-xl font-bold">!</span>
+                    </div>
+
+                    {/* Mobile Hamburger Menu */}
+                    <button className="lg:hidden" aria-label="Open menu">
+                        <Menu className="w-6 h-6 text-gray-800" />
+                    </button>
                 </div>
-                {/* Mobile Hamburger */}
-                <button className="md:hidden">
-                    {/* Lucide hamburger icon */}
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-8 h-8 text-[#1E40AF]"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <line x1="3" y1="7" x2="21" y2="7" strokeWidth="2" />
-                        <line x1="3" y1="12" x2="21" y2="12" strokeWidth="2" />
-                        <line x1="3" y1="17" x2="21" y2="17" strokeWidth="2" />
-                    </svg>
-                </button>
             </nav>
 
             <Outlet />

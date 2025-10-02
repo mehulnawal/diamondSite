@@ -30,7 +30,7 @@ export default function Navbar() {
         <>
             {/* Search Overlay */}
             <div
-                className={`fixed top-0 left-0 w-full ${isDark ? 'bg-gray-900' : 'bg-white'} transition-all duration-300 ease-in-out z-[60] ${isSearchOpen ? 'h-20 opacity-100 shadow-xl' : 'h-0 opacity-0 overflow-hidden'}`}
+                className={`fixed top-0 left-0 w-full ${isDark ? 'bg-gray-900' : 'bg-white'} transition-all duration-300 ease-in-out z-[60] ${isSearchOpen ? 'h-22 opacity-100 shadow-xl' : 'h-0 opacity-0 overflow-hidden'}`}
             >
                 <div className="max-w-4xl mx-auto h-full flex items-center justify-center px-6">
                     <form className="w-full flex">
@@ -110,7 +110,7 @@ export default function Navbar() {
                         </button>
 
                         <Link
-                            to="/account"
+                            // to="/account"
                             aria-label="User Account"
                             className="cursor-pointer"
                         >
@@ -118,7 +118,7 @@ export default function Navbar() {
                         </Link>
 
                         <Link
-                            to="/cart"
+                            // to="/cart"
                             aria-label="Shopping Cart"
                             className="relative cursor-pointer"
                         >

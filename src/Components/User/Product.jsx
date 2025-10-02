@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Heart, ShoppingCart, Star, SlidersHorizontal } from 'lucide-react'; // Added SlidersHorizontal for the mobile button
-// Attempting fix by explicitly adding the file extension again
-import FilterSidebar from '../Global/FilterSidebar.jsx'; 
+import { Heart, ShoppingCart, Star, SlidersHorizontal } from 'lucide-react';
+import FilterSidebar from '../Global/FilterSidebar.jsx';
+import { useSelector } from 'react-redux';
 
 // --- Mock Product Data ---
 const mockProducts = [
@@ -70,16 +70,14 @@ const mockProducts = [
     },
 ];
 
-// --- Product Card Component (Same as before) ---
-const ProductCard = ({ product }) => {
-    // State for hover effect to show CTA buttons
+const ProductCard = ({ product, isDark }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const formatPrice = (price) => `$${price.toLocaleString()}`;
 
     return (
         <div
-            className="group relative bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl"
+            className={`group relative ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} border rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -89,22 +87,25 @@ const ProductCard = ({ product }) => {
                     src={product.image}
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => { e.target.onerror = null; e.target.src="https://placehold.co/600x600/C0C9D0/000000?text=Jewelry" }}
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://placehold.co/600x600/C0C9D0/000000?text=Jewelry"
+                    }}
                 />
-                
+
                 {/* Overlay Buttons (appear on hover) */}
-                <div 
-                    className={`absolute inset-0 bg-black/10 flex items-center justify-center space-x-3 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+                <div
+                    className={`absolute inset-0 ${isDark ? 'bg-black/30' : 'bg-black/10'} flex items-center justify-center space-x-3 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
                 >
-                    <button 
+                    <button
                         aria-label="Add to Wishlist"
-                        className="p-3 rounded-full bg-white text-gray-800 hover:bg-[#D4AF37] hover:text-white transition-colors duration-200 shadow-md"
+                        className={`p-3 rounded-full ${isDark ? 'bg-gray-700 text-white hover:bg-[#D4AF37]' : 'bg-white text-gray-800 hover:bg-[#D4AF37] hover:text-white'} transition-colors duration-200 shadow-md`}
                     >
                         <Heart size={20} />
                     </button>
-                    <button 
+                    <button
                         aria-label="Add to Cart"
-                        className="p-3 rounded-full bg-white text-gray-800 hover:bg-[#D4AF37] hover:text-white transition-colors duration-200 shadow-md"
+                        className={`p-3 rounded-full ${isDark ? 'bg-gray-700 text-white hover:bg-[#D4AF37]' : 'bg-white text-gray-800 hover:bg-[#D4AF37] hover:text-white'} transition-colors duration-200 shadow-md`}
                     >
                         <ShoppingCart size={20} />
                     </button>
@@ -113,24 +114,24 @@ const ProductCard = ({ product }) => {
 
             {/* Product Details */}
             <div className="p-4 text-center">
-                <h3 className="text-lg font-semibold text-gray-800 truncate mb-1">
+                <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-800'} truncate mb-1`}>
                     {product.name}
                 </h3>
-                
+
                 {/* Price Display */}
                 <div className="flex justify-center items-center space-x-2 mb-2">
                     <p className="text-xl font-bold text-[#D4AF37]">
                         {formatPrice(product.price)}
                     </p>
                     {product.originalPrice && (
-                        <p className="text-sm text-gray-400 line-through">
+                        <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'} line-through`}>
                             {formatPrice(product.originalPrice)}
                         </p>
                     )}
                 </div>
 
                 {/* Rating */}
-                <div className="flex items-center justify-center text-sm text-gray-500">
+                <div className={`flex items-center justify-center text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                     <Star size={14} className="text-yellow-400 fill-yellow-400 mr-1" />
                     <span>{product.rating.toFixed(1)}</span>
                     <span className="ml-2">({product.reviews})</span>
@@ -143,28 +144,29 @@ const ProductCard = ({ product }) => {
 
 // --- Main Product Component ---
 export default function Product() {
-    // State to control the visibility of the mobile filter modal
+    const theme = useSelector((store) => store.themeSlice.value);
+    const isDark = theme === 'dark';
+
     const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
-    // In a real application, you would manage filter state here and use it to filter mockProducts
-    const [sortBy, setSortBy] = useState('featured'); // Example sort state
+    const [sortBy, setSortBy] = useState('featured');
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
             {/* 1. Filter Sidebar (Fixed Position, passes modal state handlers) */}
-            <FilterSidebar 
-                isMobileModalOpen={isMobileModalOpen} 
-                setIsMobileModalOpen={setIsMobileModalOpen} 
+            <FilterSidebar
+                isMobileModalOpen={isMobileModalOpen}
+                setIsMobileModalOpen={setIsMobileModalOpen}
             />
 
             {/* 2. Main Content Grid (Pushed by Sidebar on Desktop) */}
             <main className="lg:ml-72 xl:ml-80 pt-20 p-4 sm:p-8">
-                
+
                 {/* Header and Sorting */}
-                <header className="flex justify-between items-center pb-6 border-b border-gray-200 mb-6">
-                    <h1 className="text-3xl font-serif font-bold text-gray-900">
+                <header className={`flex justify-between items-center pb-6 ${isDark ? 'border-gray-700' : 'border-gray-200'} border-b mb-6`}>
+                    <h1 className={`text-3xl font-serif font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                         All Diamond Jewelry
                     </h1>
-                    
+
                     <div className="flex items-center space-x-4">
                         {/* Mobile Filter Button (Visible on Small Screens) */}
                         <button
@@ -175,14 +177,17 @@ export default function Product() {
                             Filters
                         </button>
 
-                        <label htmlFor="sort" className="text-gray-600 text-sm hidden sm:block">
+                        <label
+                            htmlFor="sort"
+                            className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm hidden sm:block`}
+                        >
                             Sort by:
                         </label>
                         <select
                             id="sort"
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value)}
-                            className="p-2 border border-gray-300 rounded-md focus:ring-[#D4AF37] focus:border-[#D4AF37] text-sm font-medium"
+                            className={`p-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'} border rounded-md focus:ring-[#D4AF37] focus:border-[#D4AF37] text-sm font-medium`}
                         >
                             <option value="featured">Featured</option>
                             <option value="price-asc">Price: Low to High</option>
@@ -195,7 +200,7 @@ export default function Product() {
                 {/* Product Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
                     {mockProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                        <ProductCard key={product.id} product={product} isDark={isDark} />
                     ))}
                 </div>
 
